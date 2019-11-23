@@ -1,0 +1,162 @@
+//Mateescu Cristina-Ramona, 321CB, tema2
+//Readme
+
+	Readme-ul contine doua parti : 
+
+	1) Detaliile de implementare
+	2) Demonstratia ca transformarea e polinomiala
+
+	1) Transformarea primeste un graf si intoarce o formula - o expresie booleana.
+	   Aceasta formula se obtine prin concatenarea a 4 formule;
+		- fiecare din cele 4 reprezinta o conditie a grafului
+		- astfel incat, daca cele 4 formule sunt satisfiabile, formula in sine e satisfiabila
+		- deci exista un ciclu hamiltonian in graf
+	
+	Pentru constructia formulei, la citirea grafului din fisier, s-au construit urmatoarele:
+		- Matricea de Adiacenta : "muchii" , care este simetrica ( graful este neorientat)
+		- Vectorul de grade : "grade", in care se retin gradele nodurilor
+		* unde grad reprezinta numarul de muchii incidente
+	
+	Initial se citesc datele de input si se construiesc matricea de adiacenta si vectorul de grade.
+	
+	Se verifica o conditie suplimentara : Conditia 0
+	In cazul in care conditia 0 nu este respectata, formula nu este satisfiabila;
+		* in acest caz se afiseaza o formula de tipul "x1-1 & ~x1-1",
+		* care va fi falsa sub orice interpretare;
+	Conditia 0 se refera la gradul minim al unui nod:
+
+	Conditia0: Pentru ca in graf sa poata exista un ciclu, gradul fiecarui nod trebuie sa fie minimum 2;
+
+	Formula 1
+		- formula 1 se refera la urmatoarea conditie : 
+
+	Conditia1: In drumul ales din graf, un nod poate avea doar doua muchii incidente
+		
+		- aceasta conditie face referire la modul in care sunt construite variabilele xi-j
+		- pentru un nod i, doar doua dintre variabilele xi-j pot avea valoarea 1 
+		- cu j = nod in graf a.i. (i,j) e muchie in graful principal
+
+	Pentru un nod i, cu muchiile incidente a, b c,..,z formula1 arata astfel : 
+			
+		Ci = ((xi-a & xi-b & ~xi-c & ...& ~xi-z)|	
+		      (xi-a & xi-c & ~xi-b & .. & ~xi-z)|
+		      (xi-b & xi-c & ~xi-a & .. & ~xi-z)| 
+		       .................................|
+		      (xi-y & xi-z & ~xi-a & .. & ~xi-t))
+
+	Formula se va scrie pentru fiecare i = nod in graf : 
+		C1 & C2 & C3 ..& Cn
+	
+	
+	Formula 2
+		- formula 2 se refera la urmatoarea conditie : 
+	
+	Conditia2 : Daca in graf exista un ciclu hamiltonian
+		    Atunci distanta de la orice nod la nodul 1 nu poate fi mai mare decat n/2 + 1
+		    * unde n = numarul de noduri
+
+		    - formula se construieste cu ajutorul variabilelor ai-j
+		    Pentru orice nod i (diferit de 1 ) formula se scrie : 
+
+		Ci = ( a1-i | a2-i | ... | a(n/2+1)-i )
+
+	Pentru fiecare nod i din graf , i != 1
+		C1 & C2 & C3 ... & Cn
+
+
+
+	Formula 3 
+		- va fi satisfiabila daca graful dat este un graf neorientat;
+
+	Conditia de graf neorientat se implementeaza prin : 
+		
+		- daca ( u, v ) este muchie in graf, atunci si ( v, u ) este muchie in graf;
+		- asta inseamna ca doua variabile xi-j si xj-i nu pot fi 0 in acelasi timp
+
+	Pentru o muchie (u,v) din graf, formula se scrie : 
+		
+		Cu-v = ((xu-v | ~xv-u ) & (~xu-v | xv-u ))
+	
+	Formula 3 se va scrie pentru fiecare muchie din graf: Cu1-v1 & Cu2-v2 & .. & Cum-vm
+		unde m = numarul de muchii din graf
+		     ui, vi - nodurile intre care exista muchia i
+	
+		
+	
+	Formula 4 
+		- conditia 4 este o conditie de corectitudine a intepretarii variabilelor ai-j
+		- pentru i = 1 
+			a1-j are valoarea 1 daca xi-j este 1, adica : 
+		
+			Cj = ((a1-j | ~x1-j) & ( ~a1-j | x1-j )), unde j e un nod al grafului, j!=1 si exista muchia (1,j)
+			
+			sau 
+			
+			~a1-j  , unde nu exista muchia (1,j)
+			
+			si 
+			~a1-1
+
+		Atunci formula, pentru acest caz particular : 
+		
+		Cj1 & Cj2 & Cj3 & ... & ~a1-i1 & ~ a1-i2 &...& ~a1-1
+			
+			unde : j1, j2, j3 : noduri corespunzatoare muchiilor din graf (1,j1) , (1,j2 ) ...
+			       i1, i2 ..  : noduri pentru care nu exista muchiile (1,i1) , (1, i2) ..
+		
+		- pentru i > 1
+			Distanta cea mai scurta de la un nod j la nodul 1 este egala cu i daca : 
+				- cea mai scurta distanta de la un alt nod j' la nodul 1 este egala cu i-1 
+				- nodul j' este incident cu j 
+				
+			Adica : 
+				ai-j = 1  daca a(i-1)j' = 1 si xj'-j = 1 si a(i-k)-j = 0 , unde k = 1,(i-1)
+			
+		Pentru un nod, aceste conditii duc la o formula de forma : 
+		
+		Cij = (( ai-j | ~ (((a(i-1)-j1 & xj1-j ) | (a(i-1)-j2 & xj2-j ) | ... ) & (a(i-1)-j | a(i-2)-j | ... a1-j))) &
+		      (( ~ai-j |  (((a(i-1)-j1 & xj1-j ) | (a(i-1)-j2 & xj2-j ) | ... ) & (a(i-1)-j | a(i-2)-j | ... a1-j))))
+			
+			
+		unde i = 2, (n/2+1)
+		     j = nod din graf 		 		
+			
+		In caz general : 
+			C2-2 & C2-3 & ... & C(n/2+1)-n
+
+		
+		Atunci, expresia booleana completa va fi :
+			
+			Formula1 & Formula2 & Formula3 & Formula4
+		 
+		
+	2) Demonstratia ca transformarea e polinomiala	
+
+
+		Vom calcula complexitatea pentru implementare : 
+			
+			- initial se realizeaza cateva operatii in timp constant O(1)
+			- citirea inputului - pentru un graf de n noduri, numarul maxim de muchii este n*(n-1)/2
+					    - citirea se face in timp polinomial O(n^2)
+
+			- Conditie0  	- un "for" care merge de la 1 la n : O(n) - timp polinomial
+			- Formula1 
+					- 4 "for" - uri de la 1 la n +- cateva operatii O(1)
+					- O(n^4) - timp polinomial
+			- Formula2 
+					- 2 "for"-uri 
+						* primul 1,n
+						* al doilea 1,(n/2)+1
+					- O(n^2) - timp polinomial
+			- Formula3 		
+					- O(n^2) (2 "for"-uri de la 1 la n ) - timp polinomial
+			
+			- Formula4 					
+					- O(n) + O(n^3) - timp polinomial
+			
+		In concluzie, transformarea este polinomiala.
+
+
+
+ 
+		
